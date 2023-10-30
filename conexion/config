@@ -1,0 +1,8 @@
+{
+    "conexion": {
+        "server" : "localhost",
+        "user": "root",
+        "DB_PASSWORD": "",
+        "database": "crud_api"
+    }
+}
