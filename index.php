@@ -38,7 +38,8 @@ switch($metodo) {
 
 function consulta($conexion, $id) {
     // $comandoSql  = "SELECT * FROM usuarios";
-    $comandoSql  = ($id === null) ? "SELECT * FROM usuarios": "SELECT * FROM usuarios WHERE id = $id";
+    $id_ = (int)$id;
+    $comandoSql  = ($id === null) ? "SELECT * FROM usuarios": "SELECT * FROM usuarios WHERE id = $id_";
     $resultado = $conexion->consulta_($comandoSql);
     if($resultado) {
         $dato = array();
@@ -57,9 +58,19 @@ function insertar($conexion) {
     $nombre = $dato['nombre'];
     $apellido = $dato['apellido'];
     $correo = $dato['correo'];
-    $comandoSql = "INSERT INTO `usuarios` (`id`, `name`, `lastname`, `email`) VALUES (?,?,?,?)";
-    $resultado = $conexion->insertar_($comandoSql, $id, $nombre, $apellido, $correo);
-    echo $resultado;
+    $id = (int)$id; // Asegura que $id sea un entero
+    if((filter_var($nombre, FILTER_SANITIZE_STRING)) &&  (filter_var($apellido, FILTER_SANITIZE_STRING)) && (filter_var($correo, FILTER_VALIDATE_EMAIL) === false)) {
+        $response = array(); 
+        $response['message'] = "Diga un Dato correcto";
+    } else {
+        $nombre = htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8');
+        $apellido = htmlspecialchars($apellido, ENT_QUOTES, 'UTF-8');
+        $comandoSql = "INSERT INTO `usuarios` (`id`, `name`, `lastname`, `email`) VALUES (?,?,?,?)";
+        $resultado = $conexion->insertar_($comandoSql, $id, $nombre, $apellido, $correo);
+        echo $resultado;
+    }
+
+
 
 }
 
@@ -67,8 +78,9 @@ function insertar($conexion) {
 function eliminar($conexion) {
     $dato = json_decode(file_get_contents('php://input'), true);
     $id = $dato['id'];
+    $id_ = (int)$id; 
     $comandoSql = "DELETE FROM `usuarios`  WHERE id=?";
-    $resultado = $conexion->eliminar_($comandoSql, $id);
+    $resultado = $conexion->eliminar_($comandoSql, $id_);
     echo $resultado;
     
 }
